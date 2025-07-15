@@ -9,6 +9,11 @@ A curated collection of **ASCII diagrams** representing the **internal architect
 ## 📁 Structure
 
 Each directory represents a **category** of tools, and each `.txt` file contains a focused architecture diagram.
+### Python Internals
+  #### 🔄 Asyncio Event Loop 
+  📁 [`python-internals/asyncio_event_loop.txt`](./python-internals/asyncio_event_loop.txt)
+
+A deep dive into how asyncio handles task execution, pausing/resuming with I/O events, and its architectural role.
 
 
 ---
