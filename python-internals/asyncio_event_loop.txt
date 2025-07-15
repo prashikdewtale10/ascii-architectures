@@ -1,0 +1,108 @@
+                                        ========================
+                                        🔄 ASYNCIO EVENT LOOP
+                                        ========================
+                              
+                              +----------------------------------------------+
+                              |              Python Program                  |
+                              |  (Defines coroutines, tasks, awaits, etc.)   |
+                              +----------------------+-----------------------+
+                                                     |
+                                                     ▼
+                                       +------------------------------+
+                                       |     asyncio.run(main())      |
+                                       +-------------+----------------+
+                                                     |
+                                                     ▼
+                                       +------------------------------+
+                                       |     Event Loop Created       |
+                                       +-------------+----------------+
+                                                     |
+                                   +-----------------+------------------+
+                                   |                 |                  |
+                                   ▼                 ▼                  ▼
+                              +--------+       +------------+       +------------+
+                              | Task A |       |  Task B    |       |  Task C    |
+                              | (I/O)  |       |  (Sleep)   |       |  (API call)|
+                              +--------+       +------------+       +------------+
+                                   |                 |                   |
+                                   | <await>         | <await>           | <await>
+                                   ▼                 ▼                   ▼
+                               [Paused]           [Paused]            [Paused]
+                                   |                 |                   |
+                                   +--------+--------+--------+----------+
+                                                     |
+                                                     ▼
+                                      +------------------------------+
+                                      |     I/O Completion Event     |
+                                      |  (Socket, DB, File, Timer)   |
+                                      +-------------+----------------+
+                                                    |
+                                                    ▼
+                                       +--------------------------+
+                                       |   Resume Corresponding   |
+                                       |         Task             |
+                                       +--------------------------+
+
+
+🧠 Key Concepts:
+----------------
+- `asyncio.run()` sets up and runs the main event loop.
+- Awaiting a task pauses it, allowing other tasks to run.
+- I/O-bound tasks use non-blocking operations.
+- Event loop handles scheduling and resuming tasks based on I/O completion.
+
+🔥 Benefit:
+- Efficient concurrency without threads or processes — ideal for I/O-heavy workloads.
+
+
+📦 Event Loop Components:
+--------------------------
+- Ready queue
+- Scheduled callbacks
+- Awaitables (coroutines, tasks)
+- I/O Selector (epoll, kqueue, etc.)
+- Exception handlers
+
+
+🕒 Event Loop Timeline (Simplified):
+------------------------------------
+Time →
+[Task A running] --await--> [Task B runs] --await--> [Task C runs]
+      ▼                      ▼                       ▼
+   I/O pending            sleep(1)               API call
+      ▼                      ▼                       ▼
+[Task A resumes]    [Task B resumes]       [Task C resumes]
+
+
+📊 Comparison with Other Concurrency Models:
+--------------------------------------------
+| Feature          | asyncio          | threading        | multiprocessing  |
+|------------------|------------------|------------------|------------------|
+| Concurrency Type | Single-threaded  | Multi-threaded   | Multi-process    |
+| Ideal For        | I/O-bound        | I/O-bound        | CPU-bound        |
+| Overhead         | Low              | Medium           | High             |
+| Context Switch   | Manual (`await`) | Automatic        | Separate memory  |
+
+
+📎 Common Use Cases:
+---------------------
+- Web servers (FastAPI, aiohttp)
+- Websockets and chat apps
+- Async API consumption (httpx)
+- Async database access (asyncpg)
+- Schedulers and crawlers
+
+
+🔧 asyncio Primitives:
+-----------------------
+- asyncio.create_task()
+- asyncio.gather()
+- asyncio.sleep()
+- asyncio.Queue
+- asyncio.Event / Lock / Semaphore
+
+
+⚠️ Thread-Safety Note:
+------------------------
+Do not run blocking operations (e.g., `time.sleep()`, sync DB queries) in async code.
+Use async equivalents like `asyncio.sleep()` or async DB clients to avoid freezing the loop.
