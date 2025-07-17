@@ -1,0 +1,45 @@
+                                        ===============================
+                                            FLOW OF AWAIT IN ASYNCIO
+                                        ===============================
+                                        
+                                        +------------------------------+
+                                        |  async def main():           |
+                                        |      await task_a()          |◄────────────-──┐
+                                        +-------------+----------------                 │
+                                                      |                                 │
+                                                      ▼                                 │
+                                        +------------------------------+                │
+                                        | async def task_a():          |                │
+                                        |     await asyncio.sleep(1)   |                │
+                                        +-------------+----------------+                │
+                                                      |                                 │
+                                                      ▼                                 │
+                                        +------------------------------+                │
+                                        | asyncio.sleep(1) returns a   |                │
+                                        |  coroutine (awaitable)       |                │
+                                        +-------------+----------------                 │
+                                                      |                                 │
+                                                      ▼                                 │
+                                            Control returns to event loop               │
+                                                      |                                 │
+                                                      ▼                                 │
+                                           +-------------------------------+            │
+                                           | Event loop suspends task_a    |            │
+                                           | and looks for next task       |            │
+                                           +-------------------------------+            │ 
+                                                      |                                 │
+                                                      ▼                                 │
+                                      [ Other scheduled tasks run here... ]             │
+                                                      |                                 │
+                                                      ▼                                 │
+                                        +-------------------------------+               │
+                                        | After 1 second, event loop    |               │
+                                        | gets signal from sleep timer  |               │
+                                        +-------------+-----------------+               │
+                                                      |                                 │
+                                                      ▼                                 │
+                                        +-----------------------------------+           │
+                                        | Event loop resumes task_a         |───────────┘
+                                        | where it was paused (after await) |
+                                        +-----------------------------------+
+                                        
