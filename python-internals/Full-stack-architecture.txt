@@ -1,0 +1,39 @@
+Full Stack Architecture 
+------------------------
+
+Server (8 CPU cores)
+        |
+        +---- Load Balancer / Request Router
+        |
+        +---- Process 1 (Gunicorn Worker) [CPU: 2 cores]
+        |        |
+        |        +---- ThreadPool (4 threads)
+        |        |        |
+        |        |        +---- Worker Thread 1 -> Connection Pool
+        |        |        +---- Worker Thread 2 -> Task Queue Consumer
+        |        |        +---- Worker Thread 3 -> I/O Handler
+        |        |        +---- Worker Thread 4 -> Background Jobs
+        |        |
+        |        +---- Async Event Loop (asyncio)
+        |                 |
+        |                 +---- Async Task Handler A
+        |                 +---- Async Task Handler B
+        |
+        +---- Process 2 (Gunicorn Worker) [CPU: 2 cores]
+        |
+        +---- Process 3 (Gunicorn Worker) [CPU: 2 cores]
+        |
+        +---- Process 4 (Gunicorn Worker) [CPU: 2 cores]
+        |
+        +---- Shared Resources Layer
+        |        |
+        |        +---- Redis Cache (Session/Cache Store)
+        |        +---- Database Connection Pool
+        |        +---- Message Queue (RabbitMQ/Celery)
+        |        +---- Monitoring/Logging (Prometheus, ELK)
+        |
+        +---- Worker Processes (Celery/Beat)
+                 |
+                 +---- Background Task Worker 1
+                 +---- Background Task Worker 2
+                 +---- Scheduled Task Scheduler
