@@ -1,0 +1,19 @@
+Full Stack Architecture
+------------------------
+
+Server (8 CPU cores)
+        |
+        +---- Process 1 (Gunicorn Worker)
+        |        |
+        |        +---- Thread 1
+        |        |        |
+        |        |        +---- Async Task A
+        |        |        +---- Async Task B
+        |        |
+        |        +---- Thread 2
+        |
+        +---- Process 2 (Gunicorn Worker)
+        |
+        +---- Process 3 (Gunicorn Worker)
+        |
+        +---- Process 4 (Gunicorn Worker)
