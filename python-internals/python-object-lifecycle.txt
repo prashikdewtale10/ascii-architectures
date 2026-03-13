@@ -1,0 +1,33 @@
+Full Python Object Lifecycle
+----------------------------
+
+Object Creation
+   |
+   v
+__new__()
+   |
+   v
+__init__()
+   |
+   v
+Object Exists
+   |
+   +------ Attribute Access → __getattribute__()
+   |
+   +------ Missing Attribute → __getattr__()
+   |
+   +------ Attribute Set → __setattr__()
+   |
+   +------ Print → __str__()
+   |
+   +------ Compare → __eq__()
+   |
+   +------ Operator → __add__()
+   |
+   +------ Callable → __call__()
+   |
+   v
+Object Destroyed
+   |
+   v
+__del__()
