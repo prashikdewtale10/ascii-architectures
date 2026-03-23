@@ -1,0 +1,42 @@
+Production-level ASCII diagram showing the full flow from a Django application → Celery Beat → Broker → Celery Workers
+
+
+
+                   ┌──────────────────────────────┐
+                   │        Django App            │
+                   │  (views / signals / cron)    │
+                   └─────────────┬────────────────┘
+                                 │
+                                 │ 1. Define schedule
+                                 │    (settings.py / DB)
+                                 ▼
+                   ┌──────────────────────────────┐
+                   │        Celery Beat           │
+                   │     (Scheduler Process)      │
+                   └─────────────┬────────────────┘
+                                 │
+                                 │ 2. Task is due
+                                 │    → send_task()
+                                 ▼
+                   ┌──────────────────────────────┐
+                   │       Message Broker         │
+                   │   (Redis / RabbitMQ Queue)   │
+                   └─────────────┬────────────────┘
+                                 │
+                                 │ 3. Task pulled
+                                 ▼
+                   ┌──────────────────────────────┐
+                   │      Celery Worker           │
+                   │     (Main Process)           │
+                   └─────────────┬────────────────┘
+                                 │
+                 ┌───────────────┼────────────────┐
+                 │               │                │
+                 ▼               ▼                ▼
+        ┌─────────────┐  ┌─────────────┐  ┌─────────────┐
+        │ Worker P1   │  │ Worker P2   │  │ Worker P3   │
+        │ (Process)   │  │ (Process)   │  │ (Process)   │
+        └──────┬──────┘  └──────┬──────┘  └──────┬──────┘
+               │                │                │
+               ▼                ▼                ▼
+        Execute Task     Execute Task     Execute Task
