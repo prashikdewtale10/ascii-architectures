@@ -1,0 +1,66 @@
+                🌍 Client Layer
+        (Web App / Mobile App / 3rd Party APIs)
+                           │
+                           ▼
+        🚪 API Gateway Layer (Azure API Management)
+     - Authentication (JWT / OAuth)
+     - Rate Limiting (prevent abuse)
+     - Request Routing (microservices)
+                           │
+                           ▼
+    ┌──────────────────────────────────────────┐
+    │        🚀 Application Layer              │ 
+    │   Azure App Service (FastAPI Backend)    │
+    │------------------------------------------│
+    │ - Handles business logic                 │
+    │ - REST APIs / WebSockets                 │
+    │ - Talks to cache, DB, queues             │
+    └──────────────────────────────────────────┘
+            │                        │
+            ▼                        ▼
+
+   🧠 Cache Layer              📩 Messaging Layer
+      (Redis)                 (Azure Queue Storage)
+ - Ultra-fast reads           - Async task queue
+ - Session storage            - Decouples services
+ - Frequently used data       - Retry mechanism
+            │                        │
+            ▼                        ▼
+
+   ⚡ Fast Response         ⚙️ Background Processing
+   (Cache Hit)             (Event-driven)
+                                  │
+                                  ▼
+                      ⚙️ Azure Functions
+                (Serverless Workers / Jobs)
+              - Image processing
+              - Email sending
+              - Data aggregation
+                                  │
+                                  ▼
+
+        ┌───────────────────────────────────────┐
+        │             🗄️ Data Layer             │
+        │---------------------------------------│
+        │  📦 Blob Storage  → Files/Images     │
+        │  🗃️ Database      → Structured Data  │
+        └───────────────────────────────────────┘
+                                  │
+                                  ▼
+
+                    🔔 Notification Layer
+             - Email / SMS / Push Notifications
+
+------------------------------------------------------
+
+        🔐 Security Layer
+     Azure Key Vault
+     - Stores secrets (DB creds, API keys)
+
+        📊 Monitoring Layer
+     Application Insights
+     - Logs, metrics, performance tracing
+
+        📦 DevOps Layer
+     Azure Container Registry
+     - Stores Docker images
