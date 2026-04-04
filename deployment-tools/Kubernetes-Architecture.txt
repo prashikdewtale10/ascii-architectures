@@ -1,0 +1,106 @@
+Kubernetes Architecture (Flow-Based Understanding)
+--------------------------------------------------
+
+┌──────────────────────────────────────────────┐
+│ Step 1: You Define Desired State             │
+│----------------------------------------------│
+│ YAML File (Deployment / Service / Pod)       │
+│                                              │
+│ Example:                                     │
+│ - app: nginx                                 │
+│ - replicas: 3                                │
+│ - image: nginx:latest                        │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 2: kubectl → API Server                 │
+│----------------------------------------------│
+│ kubectl apply -f deployment.yaml             │
+│                                              │
+│ API Server = Entry point of cluster          │
+│                                              │
+│ Validates request                            │
+│ Auth + Admission Controllers                 │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 3: Store in etcd (Cluster DB)           │
+│----------------------------------------------│
+│ etcd stores:                                 │
+│ - Desired state (3 pods)                     │
+│ - Current state                              │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 4: Controller Manager                  │
+│----------------------------------------------│
+│ Watches API Server                           │
+│                                              │
+│ Example:                                     │
+│ Desired: 3 Pods                              │
+│ Actual: 0 Pods                               │
+│                                              │
+│ → Needs to create 3 Pods                     │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 5: Scheduler Assigns Nodes              │
+│----------------------------------------------│
+│ Finds best node for each Pod                 │
+│                                              │
+│ Based on:                                    │
+│ - CPU / Memory                               │
+│ - Affinity / Taints                          │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 6: Pod Assigned to Node                 │
+│----------------------------------------------│
+│ Pod spec updated with:                       │
+│ - nodeName                                   │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 7: Kubelet (Node Agent)                 │
+│----------------------------------------------│
+│ Runs on each node                            │
+│                                              │
+│ - Watches API Server                         │
+│ - Sees Pod assigned to its node              │
+│ - Starts container via container runtime     │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 8: Container Runtime                    │
+│----------------------------------------------│
+│ Example: containerd / Docker                 │
+│                                              │
+│ Pulls image                                  │
+│ Runs container                               │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 9: Pod Running                          │
+│----------------------------------------------│
+│ Your app is now live                         │
+│                                              │
+│ Status updated back to API Server            │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 10: Self-Healing Loop                   │
+│----------------------------------------------│
+│ If Pod dies:                                 │
+│                                              │
+│ Controller detects mismatch                  │
+│ → Recreates Pod                              │
+└──────────────────────────────────────────────┘
