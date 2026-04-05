@@ -1,0 +1,50 @@
++------------------------------------------------------------------------------------------------------------------+
+|                                                                                                                  |
+|                                   FastAPI Production Architecture                                                |
+|                                                                                                                  |
++------------------------------------------------------------------------------------------------------------------+
+|                                                                                                                  |
+|  [CLIENTS & EXTERNAL]           [ APPLICATION LAYER ]                                [ INFRASTRUCTURE & DATA ]   |
+|                                                                                                                  |
+|  +------------------+           +------------------------------------------+               +------------------+  |
+|  | USER AGENTS      | HTTPS/WSS | [ INGRESS ] (Nginx/Traefik)              | ASYNC DB      | [ DATABASE ]     |  |
+|  | (Browser, Mobile)|---------> | - SSL Termination, Rate Limiting         | <-----------> | (MySQL Async     |  |
+|  +------------------+           | - Reverse Proxy, Load Balancing          |   QUERY/RESP  | - SQLAlchemy 2.0 |  |
+|          ^                      +------------------------------------------+               | - Alembic Migrat.|  |
+|          | API                  +------------------------------------------+               +------------------+  |
+|          v CALLS                | [ PROCESS MANAGEMENT ] (Gunicorn master) | CACHE         +------------------+  |
+|  +------------------+           | - Spawns and manages workers             | <-----------> | [ CACHE ] (Redis)|  |
+|  | EXTERNAL APIs    |           | +---------+ +---------+ +---------+      | HIT/MISS      | - lru_cache,     |  |
+|  | (Auth0, Stripe,  |           | | Uvicorn | | Uvicorn | | Uvicorn |      |               |   object cache   |  |
+|  |  Firebase)       |           | | Worker  | | Worker  | | Worker  |      |               +------------------+  |
+|  +------------------+           | +---------+ +---------+ +---------+      | TASK          +------------------+  |
+|          ^                      |       |           |           |          | QUEUE         | [ MSG BROKER ]   |  |
+|          | DNS                  |       v           v           v          | <-----------> | (RabbitMQ/Redis) |  |
+|  +------------------+           |  +------------------------------------+  |               +------------------+  |
+|  | DNS & CDN        |           |  |      [ FASTAPI APPLICATION ]       |  |               +------------------+  |
+|  | (Cloudflare, AWS |           |  |                                    |  | EVENT         | [ OBJ STORAGE ]  |  |
+|  |  CloudFront)     |           |  | [ APP INSTANCE ] (fastapi.FastAPI) |  | <-----------> | (AWS S3, Minio)  |  |
+|  +------------------+           |  | - Config, Middleware, Routes       |  | STREAM        +------------------+  |
+|                                 |  +------------------------------------+  |                                     |
+|  [ OBSERVABILITY ]              |            |           |                 |  [ BACKGROUND TASKS ]               |
+|                                 |            v           v                 |                                     |
+|  +------------------+           |  +----------+ +-----------+ +--------+   |  +------------------+ +----------+  |
+|  | [ LOGGING ]      | STREAM    |  |SERVICES  | |MODELS     | |SCHEMAS |   |  | [CELERY/RQ WORK.]| | [CRON]    | |
+|  | (Struct. JSON,   | --------> |  |(Biz Logic)| |(SQLAlchemy)| |(Pydant)| |  | (Async Tasks,    | | (Scheduled| |
+|  |  Loki/ELK)       |           |  |          | |           | |(Valid) |   |  |  Emails, Reports)| |  Tasks)   | |
+|  +------------------+           |  +----------+ +-----------+ +--------+   |  +------------------+ +----------+  |
+|                                 |            |           |                 |                                     |
+|  +------------------+           |            v           v                 |  [ CI/CD & INFRASTRUCTURE ]         |
+|  | [ MONITORING ]   | METRICS   |  +------------------------------------+  |                                     |
+|  | (Prometheus,     | --------> |  | [ DEPENDENCIES ] (@depends)        |  |  +---------------+  +--------------+|
+|  |  Grafana, Sentry)|           |  | - Auth, DB Session, Redis Client   |  |  |    [DOCKER]   | | [ORCHESTR]    ||
+|  +------------------+           |  +------------------------------------+  |  | - Multi-stage | | (K8s/ECS)     ||
+|                                 |                                          |  |   Small Image | | - AutoScale   ||
+|  [ SECURITY ]                   |            |           |                 |  +---------------+ | - HealthCheck ||
+|                                 |            v           v                 |                    +---------------+|
+|  +------------------+           |  +------------------------------------+  |                                     |
+|  | CORS, HSTS,      |           |  | [ EXCEPTION HANDLERS ]             |  |                                     |
+|  | XSS, Clickjack,  |           |  | - Consistent API Responses         |  |                                     |
+|  | JWT/OAuth2       |           |  +------------------------------------+  |                                     |
+|  +------------------+           +------------------------------------------+                                     |
++-----------------------------------------------------------------------------------------------------------------+
