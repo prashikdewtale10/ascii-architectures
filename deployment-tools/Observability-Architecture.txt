@@ -1,0 +1,50 @@
+                        ┌──────────────────────────────┐
+                        │        End Users / APIs      │
+                        └──────────────┬───────────────┘
+                                       │
+                                       ▼
+                        ┌──────────────────────────────┐
+                        │        NGINX (SWAG)          │
+                        │  Reverse Proxy / SSL / Logs  │
+                        └──────────────┬───────────────┘
+                                       │
+                                       ▼
+        ┌──────────────────────────────────────────────────────────┐
+        │               Dockerized Applications                    │
+        │----------------------------------------------------------│
+        │  • Django / FastAPI / Esmerald Services                  │
+        │  • Background Workers (Celery / APScheduler)             │
+        │  • System Logs (Linux, Containers)                       │
+        └──────────────┬───────────────────────────────────────────┘
+                       │
+                       │ (Logs: stdout, files, container logs)
+                       ▼
+        ┌──────────────────────────────────────────────────────────┐
+        │                PROMTAIL (Log Collector)                  │
+        │----------------------------------------------------------│
+        │  • Reads logs from:                                      │
+        │      - /var/log                                          │
+        │      - Docker containers                                 │
+        │      - Application log files                             │
+        │  • Adds labels (service, container, env)                 │
+        │  • Ships logs to Loki                                    │
+        └──────────────┬───────────────────────────────────────────┘
+                       │
+                       ▼
+        ┌──────────────────────────────────────────────────────────┐
+        │                    LOKI (Log Store)                      │
+        │----------------------------------------------------------│
+        │  • Stores logs efficiently (index + chunks)              │
+        │  • Label-based querying (NOT full-text like ELK)         │
+        │  • Scalable & cost-efficient                             │
+        └──────────────┬───────────────────────────────────────────┘
+                       │
+                       ▼
+        ┌──────────────────────────────────────────────────────────┐
+        │                 GRAFANA (Visualization)                  │
+        │----------------------------------------------------------│
+        │  • Dashboards (logs + metrics)                           │
+        │  • Log queries using LogQL                               │
+        │  • Alerts (error spikes, failures)                       │
+        │  • Correlate logs with metrics                           │
+        └──────────────────────────────────────────────────────────┘
