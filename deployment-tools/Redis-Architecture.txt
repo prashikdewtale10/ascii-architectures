@@ -1,0 +1,110 @@
+┌──────────────────────────────────────────────┐
+│ Step 1: Client Sends Request                 │
+│----------------------------------------------│
+│ Application (Python / Django / FastAPI)      │
+│                                              │
+│ Example:                                     │
+│ SET user:1 "Prashik"                         │
+│ GET user:1                                   │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 2: Redis Server (Entry Point)           │
+│----------------------------------------------│
+│ Redis Server = Single-threaded event loop    │
+│                                              │
+│ - Accepts TCP connections                    │
+│ - Parses commands                            │
+│ - Uses I/O Multiplexing (epoll)              │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 3: Command Processing Engine            │
+│----------------------------------------------│
+│ Redis Core executes commands                 │
+│                                              │
+│ Example:                                     │
+│ SET → store key-value                        │
+│ GET → fetch value                            │
+│ INCR → atomic increment                      │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 4: In-Memory Data Store                 │
+│----------------------------------------------│
+│ Data stored in RAM                           │
+│                                              │
+│ Data Structures:                             │
+│ - Strings                                    │
+│ - Hashes                                     │
+│ - Lists                                      │
+│ - Sets / Sorted Sets                         │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 5: Persistence Layer (Optional)         │
+│----------------------------------------------│
+│ Ensures data durability                      │
+│                                              │
+│ - RDB (Snapshot)                             │
+│ - AOF (Append Only File)                     │
+│                                              │
+│ Writes data to disk asynchronously           │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 6: Replication (High Availability)      │
+│----------------------------------------------│
+│ Master → Replica nodes                       │
+│                                              │
+│ - Async replication                          │
+│ - Replica serves read traffic                │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 7: Redis Sentinel (Failover Manager)    │
+│----------------------------------------------│
+│ Monitors master                              │
+│                                              │
+│ If master fails:                             │
+│ → Promotes replica to master                 │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 8: Redis Cluster (Scaling)              │
+│----------------------------------------------│
+│ Data sharded across multiple nodes           │
+│                                              │
+│ - Hash slots (0–16384)                       │
+│ - Each node owns subset                      │
+│                                              │
+│ Enables horizontal scaling                   │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 9: Response Sent to Client              │
+│----------------------------------------------│
+│ Redis returns result                         │
+│                                              │
+│ Example:                                     │
+│ GET user:1 → "Prashik"                       │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 10: Continuous Event Loop               │
+│----------------------------------------------│
+│ Redis keeps running:                         │
+│                                              │
+│ - Handles thousands of requests/sec          │
+│ - Maintains low latency (<1 ms)              │
+│ - No locking (single-thread advantage)       │
+└──────────────────────────────────────────────┘
