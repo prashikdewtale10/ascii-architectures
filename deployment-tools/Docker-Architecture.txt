@@ -1,0 +1,105 @@
+┌──────────────────────────────────────────────┐
+│ Step 1: You Define What to Run               │
+│----------------------------------------------│
+│ Dockerfile / docker-compose.yml              │
+│                                              │
+│ Example:                                     │
+│ - FROM python:3.11                           │
+│ - COPY . /app                                │
+│ - CMD ["python", "app.py"]                   │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 2: Docker CLI → Docker Daemon           │
+│----------------------------------------------│
+│ docker build / docker run                    │
+│                                              │
+│ CLI sends request to dockerd (API)           │
+│                                              │
+│ dockerd = Brain of Docker                    │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 3: Image Build Process                  │
+│----------------------------------------------│
+│ Dockerfile → Image Layers                    │
+│                                              │
+│ Each instruction = Layer                     │
+│ Cached for reuse                             │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 4: Image Stored Locally / Registry      │
+│----------------------------------------------│
+│ Stored in:                                   │
+│ - Local Docker cache                         │
+│ - Or pushed to Docker Hub                    │
+│                                              │
+│ Example: nginx:latest                        │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 5: Docker Daemon Calls containerd       │
+│----------------------------------------------│
+│ dockerd delegates container lifecycle        │
+│                                              │
+│ containerd = low-level runtime manager       │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 6: containerd → runc                    │
+│----------------------------------------------│
+│ runc creates container using Linux features  │
+│                                              │
+│ Uses:                                        │
+│ - Namespaces (isolation)                     │
+│ - cgroups (resource control)                 │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 7: Container Created                    │
+│----------------------------------------------│
+│ Filesystem: Image layers + writable layer    │
+│                                              │
+│ Process starts (PID 1 inside container)      │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 8: Networking Setup                     │
+│----------------------------------------------│
+│ Docker creates network                       │
+│                                              │
+│ Types:                                       │
+│ - bridge (default)                           │
+│ - host                                       │
+│ - overlay                                    │
+│                                              │
+│ Port mapping: -p 8000:8000                   │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 9: Container Running                    │
+│----------------------------------------------│
+│ App is live                                  │
+│                                              │
+│ docker ps → shows running containers         │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 10: Lifecycle Management                │
+│----------------------------------------------│
+│ Restart policies:                            │
+│ - always                                     │
+│ - on-failure                                 │
+│                                              │
+│ Logs / Monitoring via Docker                 │
+└──────────────────────────────────────────────┘
