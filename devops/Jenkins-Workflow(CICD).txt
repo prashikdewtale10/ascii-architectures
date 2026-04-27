@@ -1,0 +1,171 @@
+┌──────────────────────────────────────────────┐
+│ Step 1: Code Changes (Developer Action)      │
+│----------------------------------------------│
+│ Developer writes code and pushes to Git      │
+│                                              │
+│ Example:                                     │
+│ git commit → git push                        │
+│                                              │
+│ Triggers CI/CD pipeline                      │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 2: Webhook Trigger (Git → Jenkins)      │
+│----------------------------------------------│
+│ GitHub/GitLab sends webhook to Jenkins       │
+│                                              │
+│ Event:                                       │
+│ - push                                       │
+│ - pull request                               │
+│                                              │
+│ Jenkins job is triggered automatically       │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 3: Jenkins Controller (Master Node)     │
+│----------------------------------------------│
+│ Central brain of Jenkins                     │
+│                                              │
+│ Responsibilities:                            │
+│ - Schedule jobs                              │
+│ - Manage pipelines                           │
+│ - Assign agents                              │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 4: Load Pipeline Definition             │
+│----------------------------------------------│
+│ Jenkinsfile is read from repo                │
+│                                              │
+│ Example:                                     │
+│ pipeline {                                   │
+│   stages {                                   │
+│     stage('Build') { ... }                   │
+│   }                                          │
+│ }                                            │
+│                                              │
+│ Defines full CI/CD workflow                  │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 5: Allocate Agent (Worker Node)         │
+│----------------------------------------------│
+│ Jenkins assigns an executor/agent            │
+│                                              │
+│ Types:                                       │
+│ - Static node                                │
+│ - Docker agent                               │
+│ - Kubernetes pod                             │
+│                                              │
+│ Execution happens here                       │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 6: Source Code Checkout                 │
+│----------------------------------------------│
+│ Jenkins pulls code from Git repo             │
+│                                              │
+│ Example:                                     │
+│ checkout scm                                 │
+│                                              │
+│ Workspace is prepared                        │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 7: Build Stage                          │
+│----------------------------------------------│
+│ Compile / install dependencies               │
+│                                              │
+│ Example:                                     │
+│ pip install -r requirements.txt              │
+│ npm install                                  │
+│                                              │
+│ Artifacts are generated                      │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 8: Test Stage                           │
+│----------------------------------------------│
+│ Run automated tests                          │
+│                                              │
+│ Example:                                     │
+│ pytest                                       │
+│ junit reports                                │
+│                                              │
+│ Fail → pipeline stops                        │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 9: Code Quality & Security              │
+│----------------------------------------------│
+│ Static analysis / scanning                   │
+│                                              │
+│ Tools:                                       │
+│ - SonarQube                                  │
+│ - Fortify                                    │
+│                                              │
+│ Ensures code quality                         │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 10: Build Artifact / Image              │
+│----------------------------------------------│
+│ Create deployable artifact                   │
+│                                              │
+│ Example:                                     │
+│ - JAR/WAR file                               │
+│ - Docker image                               │
+│                                              │
+│ docker build -t app:latest .                 │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 11: Push Artifact to Registry           │
+│----------------------------------------------│
+│ Store artifact for deployment                │
+│                                              │
+│ Example:                                     │
+│ docker push repo/app:latest                  │
+│                                              │
+│ Registry:                                    │
+│ - Docker Hub                                 │
+│ - Nexus / Artifactory                        │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 12: Deployment Stage                    │
+│----------------------------------------------│
+│ Deploy to environment                        │
+│                                              │
+│ Example:                                     │
+│ - Kubernetes (kubectl apply)                 │
+│ - VM (SSH + script)                          │
+│                                              │
+│ Environments:                                │
+│ - Dev                                        │
+│ - Staging                                    │
+│ - Production                                 │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 13: Post Actions                        │
+│----------------------------------------------│
+│ Notifications / cleanup                      │
+│                                              │
+│ Example:                                     │
+│ - Slack notification                         │
+│ - Email alerts                               │
+│ - Archive logs                               │
+└──────────────────────────────────────────────┘
