@@ -1,0 +1,145 @@
+┌──────────────────────────────────────────────┐
+│ Step 1: Initialize / Clone Repository        │
+│----------------------------------------------│
+│ You start by getting the codebase            │
+│                                              │
+│ git init        → create new repo            │
+│ git clone <url> → copy remote repo           │
+│                                              │
+│ Creates .git directory (core of Git)         │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 2: Working Directory (Your Code Area)   │
+│----------------------------------------------│
+│ You write / modify code here                 │
+│                                              │
+│ Example:                                     │
+│ - edit app.py                                │
+│ - create new files                           │
+│                                              │
+│ Git tracks changes but not saved yet         │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 3: Staging Area (Index)                 │
+│----------------------------------------------│
+│ Select what changes to commit                │
+│                                              │
+│ git add app.py                               │
+│ git add .                                    │
+│                                              │
+│ Acts like a "filter layer"                   │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 4: Local Repository (.git)              │
+│----------------------------------------------│
+│ Save snapshot of staged changes              │
+│                                              │
+│ git commit -m "Add feature"                  │
+│                                              │
+│ Git creates:                                 │
+│ - Commit (snapshot)                          │
+│ - SHA hash (unique ID)                       │
+│                                              │
+│ History is built here                        │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 5: Branching (Parallel Development)     │
+│----------------------------------------------│
+│ Create isolated environments                 │
+│                                              │
+│ git checkout -b feature/login                │
+│                                              │
+│ Multiple developers work safely              │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 6: Merge / Rebase Changes               │
+│----------------------------------------------│
+│ Combine work from different branches         │
+│                                              │
+│ git merge feature/login                      │
+│ OR                                           │
+│ git rebase main                              │
+│                                              │
+│ Merge → keeps history                        │
+│ Rebase → rewrites history (clean)            │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 7: Remote Repository (GitHub/GitLab)    │
+│----------------------------------------------│
+│ Share code with team                         │
+│                                              │
+│ git push origin feature/login                │
+│                                              │
+│ Remote acts as central source                │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 8: Pull / Sync Changes                  │
+│----------------------------------------------│
+│ Get latest updates from team                 │
+│                                              │
+│ git pull                                     │
+│ (fetch + merge)                              │
+│                                              │
+│ Avoid conflicts by syncing regularly         │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 9: Pull Request (Code Review Flow)      │
+│----------------------------------------------│
+│ Raise PR on GitHub/GitLab                    │
+│                                              │
+│ feature → develop/main                       │
+│                                              │
+│ Team reviews code                            │
+│ CI/CD may run tests                          │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 10: Merge to Main Branch                │
+│----------------------------------------------│
+│ After approval                               │
+│                                              │
+│ Code merged into main/develop                │
+│                                              │
+│ Becomes part of production-ready code        │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 11: Conflict Resolution                 │
+│----------------------------------------------│
+│ Happens during merge/rebase                  │
+│                                              │
+│ Fix manually → git add → continue            │
+│                                              │
+│ Critical team skill                          │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 12: History & Debugging                │
+│----------------------------------------------│
+│ Track and debug changes                      │
+│                                              │
+│ git log                                      │
+│ git diff                                     │
+│ git checkout <commit>                        │
+│                                              │
+│ Enables time-travel debugging                │
+└──────────────────────────────────────────────┘
