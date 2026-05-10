@@ -1,6 +1,6 @@
 # Django REST Framework (DRF) Complete Cheat Sheet
 
-### 1. DRF CORE ARCHITECTURE
+### DRF CORE ARCHITECTURE
 ```bash
 Client
   │
@@ -39,7 +39,7 @@ Renderer
   ▼
 JSON Response
 ```
-### 2. DRF PROJECT STRUCTURE
+### DRF PROJECT STRUCTURE
 ```bash
 project/
 │
@@ -74,7 +74,7 @@ project/
 └── docker/
 ```
 
-### 3. INSTALLATION
+### INSTALLATION
 ```bash
 pip install djangorestframework
 ```
@@ -85,7 +85,7 @@ INSTALLED_APPS = [
 ]
 ```
 
-### 4. BASIC APIVIEW
+### BASIC APIVIEW
 ```python
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -104,7 +104,7 @@ urlpatterns = [
     path("hello/", HelloView.as_view())
 ]
 ```
-### 5. FUNCTION BASED API
+### FUNCTION BASED API
 ```python
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -114,7 +114,7 @@ def hello(request):
     return Response({"msg": "hello"})
 ```
 
-### 6. REQUEST OBJECT
+### REQUEST OBJECT
 ```python
 request.data
 request.query_params
@@ -125,7 +125,7 @@ request.method
 request.FILES
 ```
 
-### 7. RESPONSE OBJECT
+### RESPONSE OBJECT
 ```python
 from rest_framework.response import Response
 
@@ -135,7 +135,7 @@ return Response(
 )
 ```
 
-### 8. STATUS CODES
+### STATUS CODES
 ```python
 from rest_framework import status
 
@@ -147,7 +147,7 @@ status.HTTP_403_FORBIDDEN
 status.HTTP_404_NOT_FOUND
 status.HTTP_500_INTERNAL_SERVER_ERROR
 ```
-### 9. SERIALIZERS
+### SERIALIZERS
 #### Basic Serializer
 ```python
 from rest_framework import serializers
@@ -169,7 +169,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = "__all__"
 ```
 
-### 10. SERIALIZER VALIDATION FLOW
+### SERIALIZER VALIDATION FLOW
 ```bash
 Incoming JSON
       │
@@ -189,7 +189,7 @@ validate()
 validated_data
 ```
 
-### 11. FIELD VALIDATION
+### FIELD VALIDATION
 ```python
 def validate_age(self, value):
 
@@ -201,7 +201,7 @@ def validate_age(self, value):
     return value
 ```
 
-### 12. OBJECT LEVEL VALIDATION
+### OBJECT LEVEL VALIDATION
 ```python
 def validate(self, attrs):
 
@@ -211,4 +211,181 @@ def validate(self, attrs):
         )
 
     return attrs
+```
+
+### CREATE / UPDATE METHODS
+```python
+def create(self, validated_data):
+    return User.objects.create(**validated_data)
+
+def update(self, instance, validated_data):
+
+    instance.name = validated_data.get(
+        "name",
+        instance.name
+    )
+
+    instance.save()
+
+    return instance
+```
+
+### GENERIC VIEWS
+```python
+from rest_framework.generics import ListAPIView
+
+class UserList(ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+```
+### SERIALIZER IMPORTANT ATTRIBUTES
+```python
+serializer.data
+serializer.errors
+serializer.validated_data
+serializer.initial_data
+```
+
+### COMMON GENERIC VIEWS
+
+| View              | Purpose    |
+| ----------------- | ---------- |
+| ListAPIView       | GET list   |
+| RetrieveAPIView   | GET single |
+| CreateAPIView     | POST       |
+| UpdateAPIView     | PUT/PATCH  |
+| DestroyAPIView    | DELETE     |
+| ListCreateAPIView | GET + POST |
+
+### GENERIC API VIEWS
+```python
+from rest_framework.generics import (
+    ListAPIView
+)
+
+class UserListView(ListAPIView):
+
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+```
+
+### VIEWSETS
+```python
+from rest_framework.viewsets import ModelViewSet
+
+class UserViewSet(ModelViewSet):
+
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+```
+
+### ROUTERS
+```python
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+
+router.register(
+    "users",
+    UserViewSet
+)
+
+urlpatterns = router.urls
+```
+
+### VIEWSET METHOD MAPPING
+```python
+GET       /users/        → list
+GET       /users/1/      → retrieve
+POST      /users/        → create
+PUT       /users/1/      → update
+PATCH     /users/1/      → partial_update
+DELETE    /users/1/      → destroy
+```
+
+### CUSTOM ACTIONS
+```python
+from rest_framework.decorators import action
+
+@action(detail=True, methods=["post"])
+def activate(self, request, pk=None):
+
+    return Response({"status": "activated"})
+```
+
+### AUTHENTICATION
+```python
+# settings.py
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    )
+}
+```
+
+### PERMISSIONS
+#### Global Permission
+```python
+# settings.py
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated"
+    ]
+}
+```
+#### Per View
+
+```python
+from rest_framework.permissions import IsAdminUser
+
+permission_classes = [IsAdminUser]
+```
+
+### CUSTOM PERMISSION
+```python
+from rest_framework.permissions import BasePermission
+
+class IsOwner(BasePermission):
+
+    def has_object_permission(
+        self,
+        request,
+        view,
+        obj
+    ):
+        return obj.user == request.user
+```
+
+### THROTTLING
+```python
+# settings.py
+REST_FRAMEWORK = {
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.UserRateThrottle"
+    ],
+
+    "DEFAULT_THROTTLE_RATES": {
+        "user": "100/min"
+    }
+}
+```
+
+### FILTERING
+```python
+FILTERING
+```
+#### Search Filter
+```python
+from rest_framework.filters import SearchFilter
+
+filter_backends = [SearchFilter]
+search_fields = ["name"]
+```
+
+#### Ordering Filter
+```python
+from rest_framework.filters import OrderingFilter
+
+filter_backends = [OrderingFilter]
+ordering_fields = ["created_at"]
 ```
