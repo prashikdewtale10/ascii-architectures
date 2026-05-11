@@ -570,6 +570,7 @@ class UserTest(APITestCase):
             201
         )
 ```
+
 ### API CLIENT
 ```python
 self.client.get()
@@ -577,4 +578,37 @@ self.client.post()
 self.client.put()
 self.client.patch()
 self.client.delete()
+```
+### SWAGGER / OPENAPI
+```python
+pip install drf-spectacular
+```
+```python
+settings.py
+INSTALLED_APPS = [
+    "drf_spectacular"
+]
+```
+
+### PRODUCTION BEST PRACTICES
+```
+✔ Keep views thin
+✔ Move business logic to services
+✔ Use pagination
+✔ Optimize queries
+✔ Avoid serializer depth
+✔ Use caching
+✔ Use Celery for heavy tasks
+✔ Use transactions
+✔ Add rate limiting
+✔ Add logging
+✔ Use structured exceptions
+✔ Use OpenAPI docs
+✔ Add tests
+✔ Use environment variables
+✔ Never expose secrets
+✔ Use Redis cache
+✔ Use select_related/prefetch_related
+✔ Add DB indexes
+✔ Monitor slow queries
 ```
