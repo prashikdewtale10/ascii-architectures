@@ -539,12 +539,11 @@ Heavy processing
 ```
 
 ### SIGNALS
-```
+```python
 from django.db.models.signals import post_save
 
 @receiver(post_save, sender=User)
 def user_created(sender, instance, created, **kwargs):
-
     pass
 ```
 
@@ -566,9 +565,10 @@ class UserTest(APITestCase):
         )
 ```
 ### API CLIENT
+```python
 self.client.get()
 self.client.post()
 self.client.put()
 self.client.patch()
 self.client.delete()
-
+```
