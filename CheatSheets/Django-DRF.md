@@ -314,6 +314,9 @@ def activate(self, request, pk=None):
 ```
 
 ### AUTHENTICATION
+```bash
+pip install djangorestframework-simplejwt
+```
 ```python
 # settings.py
 REST_FRAMEWORK = {
@@ -347,12 +350,7 @@ from rest_framework.permissions import BasePermission
 
 class IsOwner(BasePermission):
 
-    def has_object_permission(
-        self,
-        request,
-        view,
-        obj
-    ):
+    def has_object_permission(self, request, view, obj):
         return obj.user == request.user
 ```
 
@@ -360,19 +358,20 @@ class IsOwner(BasePermission):
 ```python
 # settings.py
 REST_FRAMEWORK = {
-    "DEFAULT_THROTTLE_CLASSES": [
-        "rest_framework.throttling.UserRateThrottle"
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
     ],
-
-    "DEFAULT_THROTTLE_RATES": {
-        "user": "100/min"
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',
+        'user': '1000/day'
     }
 }
 ```
 
 ### FILTERING
 ```python
-FILTERING
+queryset = User.objects.filter(active=True)
 ```
 #### Search Filter
 ```python
@@ -388,4 +387,65 @@ from rest_framework.filters import OrderingFilter
 
 filter_backends = [OrderingFilter]
 ordering_fields = ["created_at"]
+```
+
+### DJANGO FILTER
+```bash
+pip install django-filter
+```
+```python
+# settings.py
+REST_FRAMEWORK = {
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend"
+    ]
+}
+```
+```python
+# views.py
+filterset_fields = ["status"]
+```
+
+### PAGINATION
+#### Page Number Pagination
+```python
+# settings.py
+REST_FRAMEWORK = {
+    "DEFAULT_PAGINATION_CLASS":
+        "rest_framework.pagination.PageNumberPagination",
+
+    "PAGE_SIZE": 10
+}
+```
+
+#### Custom Pagination
+```python
+from rest_framework.pagination import PageNumberPagination
+
+class CustomPagination(PageNumberPagination):
+
+    page_size = 20
+```
+#### FILE UPLOAD
+```python
+class UploadView(APIView):
+    parser_classes = [MultiPartParser]
+
+    def post(self, request):
+        file = request.FILES["file"]
+        return Response({"ok": True})
+```
+
+#### PARSERS
+```
+JSONParser
+FormParser
+MultiPartParser
+FileUploadParser
+```
+
+#### RENDERERS
+```
+JSONRenderer
+BrowsableAPIRenderer
 ```
