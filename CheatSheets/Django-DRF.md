@@ -449,3 +449,126 @@ FileUploadParser
 JSONRenderer
 BrowsableAPIRenderer
 ```
+#### DATABASE TRANSACTIONS
+```python
+from django.db import transaction
+
+@transaction.atomic
+def create_order():
+
+    pass
+```
+
+### ORM OPTIMIZATION
+#### select_related
+```python
+# Join Query
+Order.objects.select_related("user")
+```
+
+#### prefetch_related
+```python
+# Separate optimized queries.
+Order.objects.prefetch_related("items")
+```
+
+#### N+1 QUERY PROBLEM
+```python
+# Bad practice:
+for order in orders:
+    print(order.user.name)
+
+# Good practice:
+orders = Order.objects.select_related("user")
+```
+
+#### QUERYSET LAZY EVALUATION
+```python
+qs = User.objects.filter(active=True)
+# NO SQL YET.
+# SQL executes when:
+list(qs)
+len(qs)
+
+for x in qs:
+    pass
+```
+
+### CACHING
+#### Per View Cache
+```python
+from django.views.decorators.cache import cache_page
+
+@cache_page(60)
+def my_view():
+    pass
+```
+
+#### Redis Cache
+```python
+CACHES = {
+    "default": {
+        "BACKEND":
+            "django_redis.cache.RedisCache",
+
+        "LOCATION":
+            "redis://redis:6379/1",
+    }
+}
+```
+
+### ASYNC VIEWS
+```python
+class AsyncView(APIView):
+
+    async def get(self, request):
+        return Response({"ok": True})
+```
+### CELERY IN DRF
+```python
+send_email.delay(user_id)
+```
+```
+Used for:
+
+Emails
+PDF generation
+Notifications
+Reports
+Heavy processing
+```
+
+### SIGNALS
+```
+from django.db.models.signals import post_save
+
+@receiver(post_save, sender=User)
+def user_created(sender, instance, created, **kwargs):
+
+    pass
+```
+
+### TESTING API
+```python
+from rest_framework.test import APITestCase
+
+class UserTest(APITestCase):
+
+    def test_create_user(self):
+        response = self.client.post(
+            "/users/",
+            {"name": "abc"}
+        )
+
+        self.assertEqual(
+            response.status_code,
+            201
+        )
+```
+### API CLIENT
+self.client.get()
+self.client.post()
+self.client.put()
+self.client.patch()
+self.client.delete()
+
