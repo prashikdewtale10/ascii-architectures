@@ -1,0 +1,230 @@
+┌──────────────────────────────────────────────┐
+│ Step 1: User Sends Login Request             │
+│----------------------------------------------│
+│ Client → POST /api/token/                   │
+│                                              │
+│ Example Body:                                │
+│ {                                            │
+│   "username": "prashik",                     │
+│   "password": "secret123"                    │
+│ }                                            │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 2: Django URL Routing                   │
+│----------------------------------------------│
+│ urls.py maps request to JWT View             │
+│                                              │
+│ Example:                                     │
+│ TokenObtainPairView.as_view()                │
+│                                              │
+│ DRF receives HTTP request                    │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 3: DRF Request Processing               │
+│----------------------------------------------│
+│ DRF converts raw HTTP request                │
+│ into DRF Request object                      │
+│                                              │
+│ Middleware already executed                  │
+│                                              │
+│ Parsers extract JSON body                    │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 4: JWT Serializer Validates User        │
+│----------------------------------------------│
+│ TokenObtainPairSerializer                    │
+│                                              │
+│ Internally calls:                            │
+│ authenticate(username, password)             │
+│                                              │
+│ Django checks:                               │
+│ - User exists                                │
+│ - Password hash matches                      │
+│ - User is active                             │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 5: JWT Tokens Generated                 │
+│----------------------------------------------│
+│ SimpleJWT creates:                           │
+│                                              │
+│ 1. Access Token                              │
+│ 2. Refresh Token                             │
+│                                              │
+│ Tokens contain payload (claims):             │
+│ - user_id                                    │
+│ - exp (expiry)                               │
+│ - iat (issued at)                            │
+│ - token_type                                 │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 6: Token Signing                        │
+│----------------------------------------------│
+│ JWT Header + Payload                         │
+│ signed using SECRET_KEY                      │
+│                                              │
+│ Algorithm Example:                           │
+│ HS256                                        │
+│                                              │
+│ Result: Tamper-proof token                   │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 7: Tokens Returned to Client            │
+│----------------------------------------------│
+│ Response:                                    │
+│                                              │
+│ {                                            │
+│   "access": "eyJhbGc...",                    │
+│   "refresh": "eyJ0eXA..."                    │
+│ }                                            │
+│                                              │
+│ Client stores token                          │
+│                                              │
+│ Usually:                                     │
+│ - Memory                                     │
+│ - HttpOnly Cookie                            │
+│ - LocalStorage (less secure)                 │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 8: Client Accesses Protected API        │
+│----------------------------------------------│
+│ Client sends request with token              │
+│                                              │
+│ Authorization Header:                        │
+│                                              │
+│ Authorization: Bearer <token>                │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 9: DRF Authentication Pipeline          │
+│----------------------------------------------│
+│ DRF checks authentication classes            │
+│                                              │
+│ Example:                                     │
+│ JWTAuthentication                            │
+│                                              │
+│ DRF loops through auth classes               │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 10: JWTAuthentication Executes          │
+│----------------------------------------------│
+│ Extracts token from Authorization header     │
+│                                              │
+│ Splits:                                      │
+│ "Bearer eyJhbGc..."                          │
+│                                              │
+│ Gets actual JWT token                        │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 11: Token Verification                  │
+│----------------------------------------------│
+│ SimpleJWT validates:                         │
+│                                              │
+│ 1. Signature valid?                          │
+│ 2. Expired?                                  │
+│ 3. Correct token type?                       │
+│ 4. Blacklisted?                              │
+│                                              │
+│ If invalid → AuthenticationFailed            │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 12: User Loaded From Database           │
+│----------------------------------------------│
+│ user_id extracted from JWT payload           │
+│                                              │
+│ Django ORM fetches user                      │
+│                                              │
+│ request.user assigned                        │
+│ request.auth assigned                        │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 13: Permission Classes Execute          │
+│----------------------------------------------│
+│ DRF permission checks run                    │
+│                                              │
+│ Example:                                     │
+│ IsAuthenticated                              │
+│ IsAdminUser                                  │
+│ Custom permissions                           │
+│                                              │
+│ request.user now available                   │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 14: View Logic Executes                 │
+│----------------------------------------------│
+│ API View / ViewSet runs                      │
+│                                              │
+│ Example:                                     │
+│ return Response({"msg": "success"})          │
+│                                              │
+│ User identity available everywhere           │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 15: Access Token Expires                │
+│----------------------------------------------│
+│ Access token usually short-lived             │
+│                                              │
+│ Example:                                     │
+│ 5 min / 15 min / 1 hour                      │
+│                                              │
+│ Client gets 401 Unauthorized                 │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 16: Refresh Token Used                  │
+│----------------------------------------------│
+│ Client calls:                                │
+│ POST /api/token/refresh/                     │
+│                                              │
+│ Sends refresh token                          │
+│                                              │
+│ SimpleJWT validates refresh token            │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 17: New Access Token Issued             │
+│----------------------------------------------│
+│ Server returns fresh access token            │
+│                                              │
+│ User remains logged in                       │
+│ without re-entering password                 │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Step 18: Logout / Token Blacklisting         │
+│----------------------------------------------│
+│ Refresh token can be blacklisted             │
+│                                              │
+│ Future usage becomes invalid                 │
+│                                              │
+│ Requires token_blacklist app                 │
+└──────────────────────────────────────────────┘
